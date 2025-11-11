@@ -19,14 +19,29 @@ function getSessionFromCookies(): string | null {
   try {
     const cookieStore = cookies();
     
-    // Appwrite stores session in a cookie named: a_session_{projectId}
-    const sessionCookie = cookieStore.get(`a_session_${APPWRITE_PROJECT_ID}`);
+    // Try different possible cookie names
+    const possibleNames = [
+      `a_session_${APPWRITE_PROJECT_ID}`,
+      `a_session_${APPWRITE_PROJECT_ID}_legacy`,
+      'appwrite_session',
+    ];
     
-    if (!sessionCookie?.value) {
-      return null;
+    for (const name of possibleNames) {
+      const cookie = cookieStore.get(name);
+      if (cookie?.value) {
+        logger.info('Found session cookie', { cookieName: name });
+        return cookie.value;
+      }
     }
     
-    return sessionCookie.value;
+    // Log all available cookies for debugging
+    const allCookies = cookieStore.getAll();
+    logger.warn('No Appwrite session cookie found', { 
+      availableCookies: allCookies.map((c: any) => c.name),
+      expectedNames: possibleNames 
+    });
+    
+    return null;
   } catch (error) {
     logger.error('Failed to get session from cookies', error);
     return null;
