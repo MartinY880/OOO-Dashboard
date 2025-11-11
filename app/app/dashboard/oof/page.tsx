@@ -11,12 +11,12 @@ export default function OofPage() {
   const [currentSettings, setCurrentSettings] = useState<any>(null)
   const [mode, setMode] = useState<'graph' | 'n8n'>('graph')
   
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<OofSettings>({
     resolver: zodResolver(oofSettingsSchema),
     defaultValues: {
-      status: 'disabled',
-      internalReplyMessage: '',
-      externalReplyMessage: '',
+      status: 'disabled' as const,
+      internalReplyMessage: undefined,
+      externalReplyMessage: undefined,
     },
   })
   
