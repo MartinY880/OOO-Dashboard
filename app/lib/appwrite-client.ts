@@ -3,7 +3,7 @@
  * Used for OAuth authentication and user sessions
  */
 
-import { Client, Account } from 'appwrite';
+import { Client, Account, OAuthProvider } from 'appwrite';
 
 // Client-side Appwrite configuration
 const APPWRITE_ENDPOINT = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || '';
@@ -37,7 +37,7 @@ export async function loginWithMicrosoft(successUrl: string = '/dashboard', fail
     
     // This will redirect to Microsoft OAuth
     await account.createOAuth2Session(
-      'microsoft',
+      OAuthProvider.Microsoft,
       successUrl,
       failureUrl
     );
