@@ -7,18 +7,18 @@ import { Client, Databases, Users, Query } from 'node-appwrite';
 import { logger } from './logger';
 import type { UserProfile, AuditLog } from './validators';
 
-const APPWRITE_ENDPOINT = process.env.APPWRITE_ENDPOINT!;
-const APPWRITE_PROJECT_ID = process.env.APPWRITE_PROJECT_ID!;
-const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY!;
-
-if (!APPWRITE_ENDPOINT || !APPWRITE_PROJECT_ID || !APPWRITE_API_KEY) {
-  throw new Error('Missing required Appwrite environment variables');
-}
+const APPWRITE_ENDPOINT = process.env.APPWRITE_ENDPOINT || '';
+const APPWRITE_PROJECT_ID = process.env.APPWRITE_PROJECT_ID || '';
+const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY || '';
 
 /**
  * Initialize Appwrite server client
  */
 export function getAppwriteClient(): Client {
+  if (!APPWRITE_ENDPOINT || !APPWRITE_PROJECT_ID || !APPWRITE_API_KEY) {
+    throw new Error('Missing required Appwrite environment variables');
+  }
+  
   const client = new Client()
     .setEndpoint(APPWRITE_ENDPOINT)
     .setProject(APPWRITE_PROJECT_ID)
