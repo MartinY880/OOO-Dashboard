@@ -41,9 +41,12 @@ export default function OutOfOfficeSettings() {
     async function loadUser() {
       try {
         const { getCurrentSession } = await import('@/lib/appwrite-client')
-        const session = await getCurrentSession()
-        if (session) {
-          setCurrentUserId(session.$id)
+        const user = await getCurrentSession()
+        if (user) {
+          console.log('Loaded user ID:', user.$id)
+          setCurrentUserId(user.$id)
+        } else {
+          console.error('No user session found')
         }
       } catch (error) {
         console.error('Failed to get user session:', error)
