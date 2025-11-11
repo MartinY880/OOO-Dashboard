@@ -106,20 +106,39 @@ Edit `.env` and configure:
 1. Create a new project in [Appwrite Cloud](https://cloud.appwrite.io/) or your self-hosted instance
 2. Note the **Project ID** and **Endpoint**
 3. Go to **Settings** → **API Keys** → Create a new API key with:
-   - Scopes: `databases.read`, `databases.write`, `users.read`
+   - Scopes: `databases.*`, `users.*`
    - Save the key securely
-4. Update `.env` with Appwrite credentials
+4. Create `app/.env.local` with your Appwrite credentials:
+   ```bash
+   APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+   APPWRITE_PROJECT_ID=your-project-id
+   APPWRITE_API_KEY=your-api-key
+   NEXT_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+   NEXT_PUBLIC_APPWRITE_PROJECT_ID=your-project-id
+   ```
 
-### 5. Seed Appwrite Collections
+### 5. Setup Appwrite Database (Automated)
 
+Run the automated setup script to create the database and collections:
+
+**Option 1: Using Bash (Linux/Mac)**
 ```bash
-pnpm seed
+./scripts/setup-appwrite.sh
 ```
 
-This creates three collections:
-- `profiles`: User profiles with timezone and role
-- `auditLogs`: Immutable audit trail of all actions
-- `secrets`: Encrypted refresh tokens (server-only access)
+**Option 2: Using Node.js (Cross-platform)**
+```bash
+node scripts/setup-appwrite.js
+```
+
+This automatically creates:
+- **Database**: `OOO Dashboard` (ID matches your project ID)
+- **Collections**:
+  - `profiles`: User profiles with timezone and role
+  - `auditLogs`: Immutable audit trail of all actions
+  - `secrets`: Encrypted refresh tokens (server-only access)
+
+**Manual Setup**: If you prefer, see `APPWRITE_SETUP.md` for step-by-step manual instructions
 
 ### 6. Run Development Server
 

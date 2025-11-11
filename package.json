@@ -14,6 +14,7 @@
     "typecheck": "cd app && pnpm typecheck",
     "test": "cd app && pnpm test",
     "test:e2e": "cd tests && pnpm test:e2e",
+    "setup:appwrite": "node scripts/setup-appwrite.js",
     "seed": "node infra/appwrite/seed.js"
   },
   "devDependencies": {
