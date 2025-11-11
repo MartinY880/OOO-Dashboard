@@ -74,12 +74,6 @@ export async function getAccessToken(
       throw new Error('Failed to acquire token');
     }
     
-    // If we got a new refresh token, save it
-    if (result.refreshToken && result.refreshToken !== refreshToken) {
-      const newRefreshTokenEnc = encrypt(result.refreshToken);
-      await saveSecret(userId, 'microsoft', newRefreshTokenEnc);
-    }
-    
     return result.accessToken;
   } catch (error) {
     logger.error('Failed to get access token', error, { userId });
