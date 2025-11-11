@@ -68,7 +68,7 @@ function formatLog(level: LogLevel, message: string, context?: LogContext): stri
     timestamp,
     level: level.toUpperCase(),
     message,
-    ...ctx,
+    ...(ctx as Record<string, any>),
   });
 }
 
