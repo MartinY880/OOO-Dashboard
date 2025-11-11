@@ -1,9 +1,22 @@
 'use client'
 
-import { signIn } from 'next-auth/react'
+import { loginWithMicrosoft } from '@/lib/appwrite-client'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
 export default function SignIn() {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSignIn = async () => {
+    try {
+      setIsLoading(true)
+      await loginWithMicrosoft('/dashboard', '/auth/error')
+    } catch (error) {
+      console.error('Sign in failed:', error)
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-lg">
@@ -18,14 +31,15 @@ export default function SignIn() {
         
         <div className="mt-8">
           <Button
-            onClick={() => signIn('azure-ad', { callbackUrl: '/dashboard' })}
+            onClick={handleSignIn}
+            disabled={isLoading}
             className="w-full"
             size="lg"
           >
             <svg className="mr-2 h-5 w-5" viewBox="0 0 23 23" fill="currentColor">
               <path d="M0 0h11v11H0zM12 0h11v11H12zM0 12h11v11H0zM12 12h11v11H12z"/>
             </svg>
-            Sign in with Microsoft
+            {isLoading ? 'Signing in...' : 'Sign in with Microsoft'}
           </Button>
         </div>
         
