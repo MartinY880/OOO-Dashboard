@@ -13,9 +13,9 @@ import { exchangeCodeForTokens } from './graph';
 import type { UserProfile } from './validators';
 
 const AUTH_STRATEGY = process.env.AUTH_STRATEGY || 'msal';
-const AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID!;
-const AZURE_CLIENT_SECRET = process.env.AZURE_CLIENT_SECRET!;
-const AZURE_TENANT_ID = process.env.AZURE_TENANT_ID!;
+const AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID || '';
+const AZURE_CLIENT_SECRET = process.env.AZURE_CLIENT_SECRET || '';
+const AZURE_TENANT_ID = process.env.AZURE_TENANT_ID || '';
 
 /**
  * NextAuth configuration for MSAL strategy

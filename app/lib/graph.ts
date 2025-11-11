@@ -10,19 +10,19 @@ import { encrypt, decrypt } from './crypto';
 import { getSecret, saveSecret } from './appwrite';
 import type { OofSettings, ForwardingRule } from './validators';
 
-const AZURE_TENANT_ID = process.env.AZURE_TENANT_ID!;
-const AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID!;
-const AZURE_CLIENT_SECRET = process.env.AZURE_CLIENT_SECRET!;
+const AZURE_TENANT_ID = process.env.AZURE_TENANT_ID || '';
+const AZURE_CLIENT_ID = process.env.AZURE_CLIENT_ID || '';
+const AZURE_CLIENT_SECRET = process.env.AZURE_CLIENT_SECRET || '';
 const AZURE_REDIRECT_URI = process.env.AZURE_REDIRECT_URI || 'http://localhost:3000/api/auth/callback/azure-ad';
-
-if (!AZURE_TENANT_ID || !AZURE_CLIENT_ID || !AZURE_CLIENT_SECRET) {
-  throw new Error('Missing required Azure AD environment variables');
-}
 
 /**
  * MSAL Confidential Client Application
  */
 export function getMsalClient(): ConfidentialClientApplication {
+  if (!AZURE_TENANT_ID || !AZURE_CLIENT_ID || !AZURE_CLIENT_SECRET) {
+    throw new Error('Missing required Azure AD environment variables');
+  }
+  
   return new ConfidentialClientApplication({
     auth: {
       clientId: AZURE_CLIENT_ID,
