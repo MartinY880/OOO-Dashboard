@@ -1,0 +1,178 @@
+{
+  "collections": [
+    {
+      "$id": "profiles",
+      "name": "Profiles",
+      "enabled": true,
+      "documentSecurity": true,
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "size": 255,
+          "required": true
+        },
+        {
+          "key": "displayName",
+          "type": "string",
+          "size": 255,
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "string",
+          "size": 255,
+          "required": true
+        },
+        {
+          "key": "timeZone",
+          "type": "string",
+          "size": 100,
+          "required": true,
+          "default": "America/New_York"
+        },
+        {
+          "key": "role",
+          "type": "string",
+          "size": 50,
+          "required": true,
+          "default": "user"
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_unique",
+          "type": "unique",
+          "attributes": ["userId"]
+        },
+        {
+          "key": "email_index",
+          "type": "key",
+          "attributes": ["email"]
+        }
+      ]
+    },
+    {
+      "$id": "auditLogs",
+      "name": "Audit Logs",
+      "enabled": true,
+      "documentSecurity": false,
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "size": 255,
+          "required": true
+        },
+        {
+          "key": "userEmail",
+          "type": "string",
+          "size": 255,
+          "required": true
+        },
+        {
+          "key": "action",
+          "type": "string",
+          "size": 100,
+          "required": true
+        },
+        {
+          "key": "mode",
+          "type": "string",
+          "size": 20,
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "size": 20,
+          "required": true
+        },
+        {
+          "key": "payload",
+          "type": "string",
+          "size": 10000,
+          "required": false
+        },
+        {
+          "key": "error",
+          "type": "string",
+          "size": 5000,
+          "required": false
+        },
+        {
+          "key": "responseData",
+          "type": "string",
+          "size": 10000,
+          "required": false
+        },
+        {
+          "key": "createdAt",
+          "type": "datetime",
+          "required": true
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_index",
+          "type": "key",
+          "attributes": ["userId"]
+        },
+        {
+          "key": "action_index",
+          "type": "key",
+          "attributes": ["action"]
+        },
+        {
+          "key": "createdAt_index",
+          "type": "key",
+          "attributes": ["createdAt"],
+          "orders": ["DESC"]
+        }
+      ]
+    },
+    {
+      "$id": "secrets",
+      "name": "Secrets",
+      "enabled": true,
+      "documentSecurity": true,
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "size": 255,
+          "required": true
+        },
+        {
+          "key": "provider",
+          "type": "string",
+          "size": 50,
+          "required": true
+        },
+        {
+          "key": "refreshTokenEnc",
+          "type": "string",
+          "size": 5000,
+          "required": true
+        },
+        {
+          "key": "createdAt",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "key": "updatedAt",
+          "type": "datetime",
+          "required": true
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_provider_unique",
+          "type": "unique",
+          "attributes": ["userId", "provider"]
+        }
+      ]
+    }
+  ]
+}

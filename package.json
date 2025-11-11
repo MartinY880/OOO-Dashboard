@@ -1,0 +1,27 @@
+{
+  "name": "office365-management-app",
+  "version": "1.0.0",
+  "description": "Production-quality Office 365 management dashboard with Appwrite + Next.js 14",
+  "private": true,
+  "workspaces": [
+    "app"
+  ],
+  "scripts": {
+    "dev": "cd app && pnpm dev",
+    "build": "cd app && pnpm build",
+    "start": "cd app && pnpm start",
+    "lint": "cd app && pnpm lint",
+    "typecheck": "cd app && pnpm typecheck",
+    "test": "cd app && pnpm test",
+    "test:e2e": "cd tests && pnpm test:e2e",
+    "seed": "node infra/appwrite/seed.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

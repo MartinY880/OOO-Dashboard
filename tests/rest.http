@@ -1,0 +1,146 @@
+### Local Development Testing
+
+@baseUrl = http://localhost:3000
+@authToken = your-session-token-here
+
+### Health Check
+GET {{baseUrl}}/
+
+### ============================================
+### Out of Office (OOF) Management
+### ============================================
+
+### Get current OOF settings
+GET {{baseUrl}}/api/oof
+Authorization: Bearer {{authToken}}
+
+### Set OOF - Scheduled (Graph Mode)
+POST {{baseUrl}}/api/oof
+Content-Type: application/json
+
+{
+  "mode": "graph",
+  "settings": {
+    "status": "scheduled",
+    "internalReplyMessage": "<html><body><p>I'm out of the office until November 27th. I'll have limited access to email.</p></body></html>",
+    "externalReplyMessage": "<html><body><p>I'm currently out of the office and will return on November 27th.</p></body></html>",
+    "scheduledStartDateTime": {
+      "dateTime": "2025-11-20T09:00:00",
+      "timeZone": "America/New_York"
+    },
+    "scheduledEndDateTime": {
+      "dateTime": "2025-11-27T17:00:00",
+      "timeZone": "America/New_York"
+    }
+  }
+}
+
+### Set OOF - Always Enabled
+POST {{baseUrl}}/api/oof
+Content-Type: application/json
+
+{
+  "mode": "graph",
+  "settings": {
+    "status": "alwaysEnabled",
+    "internalReplyMessage": "<html><body><p>I'm on extended leave.</p></body></html>",
+    "externalReplyMessage": "<html><body><p>I'm currently unavailable.</p></body></html>"
+  }
+}
+
+### Disable OOF
+POST {{baseUrl}}/api/oof
+Content-Type: application/json
+
+{
+  "mode": "graph",
+  "settings": {
+    "status": "disabled"
+  }
+}
+
+### Set OOF via n8n
+POST {{baseUrl}}/api/oof
+Content-Type: application/json
+
+{
+  "mode": "n8n",
+  "settings": {
+    "status": "scheduled",
+    "internalReplyMessage": "<html><body><p>Out via n8n</p></body></html>",
+    "externalReplyMessage": "<html><body><p>Out via n8n</p></body></html>",
+    "scheduledStartDateTime": {
+      "dateTime": "2025-11-20T09:00:00",
+      "timeZone": "America/New_York"
+    },
+    "scheduledEndDateTime": {
+      "dateTime": "2025-11-27T17:00:00",
+      "timeZone": "America/New_York"
+    }
+  }
+}
+
+### ============================================
+### Email Forwarding Management
+### ============================================
+
+### Get current forwarding status
+GET {{baseUrl}}/api/forwarding
+Authorization: Bearer {{authToken}}
+
+### Create forwarding rule (keep copy)
+POST {{baseUrl}}/api/forwarding
+Content-Type: application/json
+
+{
+  "mode": "graph",
+  "rule": {
+    "forwardTo": "assistant@example.com",
+    "keepCopy": true,
+    "enabled": true
+  }
+}
+
+### Create forwarding rule (don't keep copy)
+POST {{baseUrl}}/api/forwarding
+Content-Type: application/json
+
+{
+  "mode": "graph",
+  "rule": {
+    "forwardTo": "assistant@example.com",
+    "keepCopy": false,
+    "enabled": true
+  }
+}
+
+### Create forwarding rule via n8n
+POST {{baseUrl}}/api/forwarding
+Content-Type: application/json
+
+{
+  "mode": "n8n",
+  "rule": {
+    "forwardTo": "assistant@example.com",
+    "keepCopy": true,
+    "enabled": true
+  }
+}
+
+### Delete forwarding rule
+DELETE {{baseUrl}}/api/forwarding?forwardTo=assistant@example.com&mode=graph
+Authorization: Bearer {{authToken}}
+
+### Delete forwarding rule via n8n
+DELETE {{baseUrl}}/api/forwarding?forwardTo=assistant@example.com&mode=n8n
+Authorization: Bearer {{authToken}}
+
+### ============================================
+### Authentication
+### ============================================
+
+### Sign in (redirects to Microsoft)
+GET {{baseUrl}}/api/auth/signin
+
+### Sign out
+GET {{baseUrl}}/api/auth/signout
