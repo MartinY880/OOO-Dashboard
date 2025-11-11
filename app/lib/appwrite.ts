@@ -64,7 +64,7 @@ export async function getProfile(userId: string): Promise<UserProfile | null> {
       return null;
     }
     
-    const doc = response.documents[0];
+    const doc = response.documents[0] as any;
     return {
       userId: doc.userId,
       displayName: doc.displayName,
@@ -169,7 +169,7 @@ export async function getAuditLogs(
       ]
     );
     
-    return response.documents.map(doc => ({
+    return response.documents.map((doc: any) => ({
       userId: doc.userId,
       userEmail: doc.userEmail,
       action: doc.action,
@@ -209,7 +209,7 @@ export async function getSecret(
       return null;
     }
     
-    return response.documents[0].refreshTokenEnc;
+    return (response.documents[0] as any).refreshTokenEnc;
   } catch (error) {
     logger.error('Failed to get secret', error, { userId, provider });
     throw error;
