@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { format } from 'date-fns'
 import { Calendar as CalendarIcon, Clock } from 'lucide-react'
@@ -18,14 +18,13 @@ type OutOfOfficeForm = {
   forwardTo?: string
 }
 
-// Mock users for the combobox
-const mockUsers = [
-  { value: 'john@company.com', label: 'John Smith (john@company.com)' },
-  { value: 'jane@company.com', label: 'Jane Doe (jane@company.com)' },
-  { value: 'bob@company.com', label: 'Bob Johnson (bob@company.com)' },
-  { value: 'alice@company.com', label: 'Alice Williams (alice@company.com)' },
-  { value: 'charlie@company.com', label: 'Charlie Brown (charlie@company.com)' },
-]
+// User search result type
+type User = {
+  value: string
+  label: string
+  email: string
+  name: string
+}
 
 export default function OutOfOfficeSettings() {
   const [loading, setLoading] = useState(false)
@@ -33,6 +32,25 @@ export default function OutOfOfficeSettings() {
   const [showEndCalendar, setShowEndCalendar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [users, setUsers] = useState<User[]>([])
+  const [searchingUsers, setSearchingUsers] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+
+  // Get current user session
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const { getCurrentSession } = await import('@/lib/appwrite-client')
+        const session = await getCurrentSession()
+        if (session) {
+          setCurrentUserId(session.$id)
+        }
+      } catch (error) {
+        console.error('Failed to get user session:', error)
+      }
+    }
+    loadUser()
+  }, [])
 
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<OutOfOfficeForm>({
     defaultValues: {
@@ -54,6 +72,10 @@ export default function OutOfOfficeSettings() {
     setLoading(true)
 
     try {
+      if (!currentUserId) {
+        throw new Error('User session not found. Please refresh the page.')
+      }
+
       // Determine status based on dates
       let status: 'alwaysEnabled' | 'scheduled' | 'disabled' = 'disabled'
       let scheduledStartDateTime: string | undefined
@@ -94,10 +116,13 @@ export default function OutOfOfficeSettings() {
         mode: 'graph', // Default to graph mode
       }
 
-      // Submit to API
+      // Submit to API with user ID header
       const res = await fetch('/api/oof', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': currentUserId,
+        },
         body: JSON.stringify(apiPayload),
       })
 
@@ -110,7 +135,10 @@ export default function OutOfOfficeSettings() {
       if (data.forwardEmails && data.forwardTo) {
         const forwardRes = await fetch('/api/forwarding', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-User-Id': currentUserId,
+          },
           body: JSON.stringify({
             forwardingAddress: data.forwardTo,
             mode: 'graph',
@@ -124,7 +152,10 @@ export default function OutOfOfficeSettings() {
         // Clear forwarding if disabled
         await fetch('/api/forwarding', {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-User-Id': currentUserId,
+          },
           body: JSON.stringify({ mode: 'graph' }),
         })
       }
@@ -138,12 +169,35 @@ export default function OutOfOfficeSettings() {
     }
   }
 
-  // Filter users based on search
-  const filteredUsers = mockUsers.filter(user =>
-    user.label.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Search for users when query changes
+  useEffect(() => {
+    const searchTimeout = setTimeout(async () => {
+      if (searchQuery && searchQuery.length >= 2 && currentUserId) {
+        setSearchingUsers(true)
+        try {
+          const response = await fetch(`/api/users?search=${encodeURIComponent(searchQuery)}`, {
+            headers: {
+              'X-User-Id': currentUserId,
+            },
+          })
+          if (response.ok) {
+            const data = await response.json()
+            setUsers(data.data || [])
+          }
+        } catch (error) {
+          console.error('Failed to search users:', error)
+        } finally {
+          setSearchingUsers(false)
+        }
+      } else {
+        setUsers([])
+      }
+    }, 300) // Debounce search
 
-  const selectedUser = mockUsers.find(u => u.value === forwardTo)
+    return () => clearTimeout(searchTimeout)
+  }, [searchQuery, currentUserId])
+
+  const selectedUser = users.find(u => u.value === forwardTo)
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -395,8 +449,13 @@ export default function OutOfOfficeSettings() {
                             }}
                           />
                           <div className="absolute z-20 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
-                            {filteredUsers.length > 0 ? (
-                              filteredUsers.map((user) => (
+                            {searchingUsers ? (
+                              <div className="px-4 py-3 text-gray-500 text-sm flex items-center gap-2">
+                                <span className="animate-spin h-4 w-4 border-2 border-gray-300 border-t-blue-600 rounded-full"></span>
+                                Searching...
+                              </div>
+                            ) : users.length > 0 ? (
+                              users.map((user) => (
                                 <button
                                   key={user.value}
                                   type="button"
@@ -408,14 +467,18 @@ export default function OutOfOfficeSettings() {
                                   className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors flex items-center gap-2"
                                 >
                                   <div className="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-sm">
-                                    {user.label.charAt(0)}
+                                    {user.name.charAt(0)}
                                   </div>
                                   <span className="text-sm text-gray-900">{user.label}</span>
                                 </button>
                               ))
-                            ) : (
+                            ) : searchQuery.length >= 2 ? (
                               <div className="px-4 py-3 text-gray-500 text-sm">
                                 No users found matching "{searchQuery}"
+                              </div>
+                            ) : (
+                              <div className="px-4 py-3 text-gray-500 text-sm">
+                                Type at least 2 characters to search
                               </div>
                             )}
                           </div>

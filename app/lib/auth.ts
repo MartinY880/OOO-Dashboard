@@ -3,7 +3,7 @@
  * Uses Appwrite OAuth2 for Microsoft authentication
  */
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { Client, Account } from 'node-appwrite';
 import { logger } from './logger';
 import { getProfile, createProfile } from './appwrite';
@@ -11,6 +11,28 @@ import type { UserProfile } from './validators';
 
 const APPWRITE_ENDPOINT = process.env.APPWRITE_ENDPOINT || '';
 const APPWRITE_PROJECT_ID = process.env.APPWRITE_PROJECT_ID || '';
+
+/**
+ * Get user ID from request headers
+ * Client should send X-User-Id header with Appwrite user ID
+ */
+export function getUserIdFromHeaders(): string | null {
+  try {
+    const headersList = headers();
+    const userId = headersList.get('x-user-id');
+    
+    if (userId) {
+      logger.info('Found user ID in headers', { userId });
+      return userId;
+    }
+    
+    logger.warn('No user ID found in headers');
+    return null;
+  } catch (error) {
+    logger.error('Failed to get user ID from headers', error);
+    return null;
+  }
+}
 
 /**
  * Get Appwrite session from cookies
@@ -103,12 +125,21 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 
 /**
  * Require authentication middleware
+ * Now uses user ID from headers
  */
 export async function requireAuth(): Promise<UserProfile> {
-  const user = await getCurrentUser();
+  // Try to get user ID from headers first
+  const userId = getUserIdFromHeaders();
+  
+  if (!userId) {
+    throw new Error('Authentication required');
+  }
+  
+  // Get user profile from database
+  const user = await getProfile(userId);
   
   if (!user) {
-    throw new Error('Authentication required');
+    throw new Error('User profile not found');
   }
   
   return user;

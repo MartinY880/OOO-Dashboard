@@ -276,3 +276,39 @@ export async function exchangeCodeForTokens(
   
   return result;
 }
+
+/**
+ * Search for users in the organization
+ * Returns a list of users matching the search query
+ */
+export async function searchUsers(
+  userId: string,
+  query: string
+): Promise<Array<{ value: string; label: string; email: string; name: string }>> {
+  try {
+    const client = await getGraphClient(userId);
+    
+    // Search users by displayName or mail
+    const response = await client
+      .api('/users')
+      .filter(
+        `startswith(displayName,'${query}') or startswith(mail,'${query}') or startswith(userPrincipalName,'${query}')`
+      )
+      .select('id,displayName,mail,userPrincipalName')
+      .top(10)
+      .get();
+    
+    logger.info('User search results', { userId, query, count: response.value?.length || 0 });
+    
+    // Map to combobox format
+    return (response.value || []).map((user: any) => ({
+      value: user.mail || user.userPrincipalName,
+      label: `${user.displayName} (${user.mail || user.userPrincipalName})`,
+      email: user.mail || user.userPrincipalName,
+      name: user.displayName,
+    }));
+  } catch (error) {
+    logger.error('Failed to search users', error, { userId, query });
+    throw error;
+  }
+}

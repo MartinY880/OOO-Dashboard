@@ -47,7 +47,7 @@ export default function DashboardHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-bold text-gray-900">
-            Office 365 Management
+            MTGPros Out of Office
           </h1>
         </div>
         
