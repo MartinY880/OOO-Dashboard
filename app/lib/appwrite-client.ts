@@ -31,9 +31,14 @@ export function getAccount(): Account {
  * Initiate Microsoft OAuth2 login
  * Redirects to Microsoft login page
  */
-export async function loginWithMicrosoft(successUrl: string = '/dashboard', failureUrl: string = '/auth/error') {
+export async function loginWithMicrosoft() {
   try {
     const account = getAccount();
+    
+    // Build absolute URLs for success and failure redirects
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const successUrl = `${baseUrl}/dashboard`;
+    const failureUrl = `${baseUrl}/auth/error`;
     
     // This will redirect to Microsoft OAuth
     await account.createOAuth2Session(

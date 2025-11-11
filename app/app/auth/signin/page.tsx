@@ -10,7 +10,7 @@ export default function SignIn() {
   const handleSignIn = async () => {
     try {
       setIsLoading(true)
-      await loginWithMicrosoft('/dashboard', '/auth/error')
+      await loginWithMicrosoft()
     } catch (error) {
       console.error('Sign in failed:', error)
       setIsLoading(false)
