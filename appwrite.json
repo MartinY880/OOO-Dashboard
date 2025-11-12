@@ -1,0 +1,195 @@
+{
+  "projectId": "69139fa80024c2f2b0da",
+  "projectName": "OOO Dashboard",
+  "databases": [
+    {
+      "id": "69139fa80024c2f2b0da",
+      "name": "OOO Dashboard",
+      "$id": "69139fa80024c2f2b0da",
+      "$createdAt": "",
+      "$updatedAt": ""
+    }
+  ],
+  "collections": [
+    {
+      "databaseId": "69139fa80024c2f2b0da",
+      "$id": "profiles",
+      "name": "User Profiles",
+      "enabled": true,
+      "documentSecurity": false,
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 36,
+          "default": null
+        },
+        {
+          "key": "displayName",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 255,
+          "default": null
+        },
+        {
+          "key": "email",
+          "type": "email",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "default": null,
+          "format": ""
+        },
+        {
+          "key": "timeZone",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 100,
+          "default": "America/New_York"
+        },
+        {
+          "key": "role",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 50,
+          "default": "user"
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_index",
+          "type": "key",
+          "status": "available",
+          "attributes": ["userId"],
+          "orders": ["ASC"]
+        }
+      ]
+    },
+    {
+      "databaseId": "69139fa80024c2f2b0da",
+      "$id": "auditLogs",
+      "name": "Audit Logs",
+      "enabled": true,
+      "documentSecurity": false,
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 36,
+          "default": null
+        },
+        {
+          "key": "action",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 100,
+          "default": null
+        },
+        {
+          "key": "details",
+          "type": "string",
+          "status": "available",
+          "required": false,
+          "array": false,
+          "size": 5000,
+          "default": null
+        },
+        {
+          "key": "ipAddress",
+          "type": "string",
+          "status": "available",
+          "required": false,
+          "array": false,
+          "size": 45,
+          "default": null
+        },
+        {
+          "key": "timestamp",
+          "type": "datetime",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "default": null,
+          "format": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_timestamp",
+          "type": "key",
+          "status": "available",
+          "attributes": ["userId", "timestamp"],
+          "orders": ["ASC", "DESC"]
+        }
+      ]
+    },
+    {
+      "databaseId": "69139fa80024c2f2b0da",
+      "$id": "secrets",
+      "name": "User Secrets",
+      "enabled": true,
+      "documentSecurity": false,
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "status": "available",
+          "required": true,
+          "array": false,
+          "size": 36,
+          "default": null
+        },
+        {
+          "key": "encryptedRefreshToken",
+          "type": "string",
+          "status": "available",
+          "required": false,
+          "array": false,
+          "size": 5000,
+          "default": null
+        },
+        {
+          "key": "encryptedAccessToken",
+          "type": "string",
+          "status": "available",
+          "required": false,
+          "array": false,
+          "size": 5000,
+          "default": null
+        },
+        {
+          "key": "tokenExpiry",
+          "type": "datetime",
+          "status": "available",
+          "required": false,
+          "array": false,
+          "default": null,
+          "format": "datetime"
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_index",
+          "type": "key",
+          "status": "available",
+          "attributes": ["userId"],
+          "orders": ["ASC"]
+        }
+      ]
+    }
+  ]
+}
