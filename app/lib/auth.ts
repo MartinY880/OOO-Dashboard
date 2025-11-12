@@ -126,6 +126,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 /**
  * Require authentication middleware
  * Now uses user ID from headers
+ * Auto-creates profile if it doesn't exist
  */
 export async function requireAuth(): Promise<UserProfile> {
   // Try to get user ID from headers first
@@ -136,10 +137,32 @@ export async function requireAuth(): Promise<UserProfile> {
   }
   
   // Get user profile from database
-  const user = await getProfile(userId);
+  let user = await getProfile(userId);
   
+  // If profile doesn't exist, create a basic one
+  // The user is already authenticated via Appwrite OAuth
   if (!user) {
-    throw new Error('User profile not found');
+    logger.info('Profile not found, creating basic profile', { userId });
+    
+    try {
+      // Create profile with basic info
+      // We'll use the userId as displayName initially, can be updated later
+      const newProfile: UserProfile = {
+        userId: userId,
+        displayName: userId, // Will be updated with real name from Graph API on first use
+        email: userId, // Will be updated with real email from Graph API on first use
+        timeZone: 'America/New_York',
+        role: 'user',
+      };
+      
+      await createProfile(newProfile);
+      logger.info('Auto-created basic user profile', { userId });
+      
+      user = newProfile;
+    } catch (error) {
+      logger.error('Failed to auto-create profile', error, { userId });
+      throw new Error('User profile not found and could not be created');
+    }
   }
   
   return user;
